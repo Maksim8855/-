@@ -5,7 +5,14 @@
 #include <algorithm>
 #include <random>
 
-using namespace std;
+using std::string;
+using std::vector;
+using std::unique_ptr;
+using std::make_unique;
+using std::endl;
+using std::cout;
+using std::cerr;
+using std::cin;
 
 class User {
 protected:
@@ -18,7 +25,7 @@ public:
 
     string getUsername() const { return username; }
 
-    virtual ~User () = default;
+    virtual ~User() = default;
 };
 
 class Buyer : public User {
@@ -43,7 +50,8 @@ private:
 
 public:
     Item(string itemName, double itemPrice, unique_ptr<Seller> itemOwner)
-        : name(itemName), price(itemPrice), owner(move(itemOwner)) {}
+        : name(itemName), price(itemPrice), owner(move(itemOwner)) {
+    }
 
     string getName() const { return name; }
     double getPrice() const { return price; }
@@ -73,11 +81,11 @@ public:
         }
     }
 
-    void buyItem(const string &itemName, Buyer *buyer) {
+    void buyItem(const string& itemName, Buyer* buyer) {
         for (auto it = items.begin(); it != items.end(); ++it) {
             if ((*it)->getName() == itemName) {
                 cout << "Покупатель " << buyer->getUsername() << " купил " << itemName
-                     << " за " << (*it)->getPrice() << endl;
+                    << " за " << (*it)->getPrice() << endl;
                 items.erase(it);
                 return;
             }
@@ -85,15 +93,16 @@ public:
         cout << "Товар " << itemName << " не найден." << endl;
     }
 
-    void bidItem(const string &itemName, double bidPrice, Buyer *buyer) {
-        for (auto &item : items) {
+    void bidItem(const string& itemName, double bidPrice, Buyer* buyer) {
+        for (auto& item : items) {
             if (item->getName() == itemName) {
                 if (bidPrice > item->getPrice()) {
                     item->setPrice(bidPrice);
                     cout << "Покупатель " << buyer->getUsername() << " повысил цену на " << itemName
-                         << " до " << bidPrice << endl;
+                        << " до " << bidPrice << endl;
                     return;
-                } else {
+                }
+                else {
                     cout << "Ставка слишком низкая. Текущая цена: " << item->getPrice() << endl;
                     return;
                 }
@@ -119,7 +128,7 @@ int main() {
 
     while (true) {
         cout << "\nМеню:\n";
-        cout << "1. Создать аккаунт покупателя\n";
+        cout << "1. Создать аккаунт\n";
         cout << "2. Добавить товар\n";
         cout << "3. Просмотреть товары\n";
         cout << "4. Сделать ставку на товар\n";
@@ -135,9 +144,10 @@ int main() {
             cout << "Введите имя покупателя: ";
             cin >> username;
             buyers.push_back(make_unique<Buyer>(username));
-            cout << "Аккаунт покупателя создан!" << endl;
+            cout << "Аккаунт создан!" << endl;
 
-        } else if (choice == 2) {
+        }
+        else if (choice == 2) {
             string itemName;
             double itemPrice;
             cout << "Введите название товара: ";
@@ -148,10 +158,12 @@ int main() {
             auction.addItem(make_unique<Item>(itemName, itemPrice, nullptr));
             cout << "Товар добавлен!" << endl;
 
-        } else if (choice == 3) {
+        }
+        else if (choice == 3) {
             auction.displayItems();
 
-        } else if (choice == 4) {
+        }
+        else if (choice == 4) {
             string itemName;
             double bidPrice;
             cout << "Введите название товара для ставки: ";
@@ -162,26 +174,31 @@ int main() {
             if (!buyers.empty()) {
                 int randomIndex = rand() % buyers.size();
                 auction.bidItem(itemName, bidPrice, buyers[randomIndex].get());
-            } else {
+            }
+            else {
                 cout << "Нет доступных покупателей для ставок." << endl;
             }
 
-        } else if (choice == 5) {
+        }
+        else if (choice == 5) {
             string itemName;
             cout << "Введите название товара для покупки: ";
             cin >> itemName;
 
             if (!buyers.empty()) {
                 auction.buyItem(itemName, buyers.back().get());
-            } else {
+            }
+            else {
                 cout << "Нет доступных покупателей для покупки." << endl;
             }
 
-        } else if (choice == 6) {
+        }
+        else if (choice == 6) {
             cout << "Выход из программы." << endl;
             break;
 
-        } else {
+        }   
+        else {
             cout << "Неверный выбор. Попробуйте снова." << endl;
         }
     }
